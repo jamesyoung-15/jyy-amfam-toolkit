@@ -8,7 +8,7 @@ eventually GitLab).
 - Python >= 3.13
 - [uv](https://docs.astral.sh/uv/) installed
 - `git` available on your PATH
-- A Jira Cloud account on `amfament.atlassian.net` with an API token
+- A Jira Cloud account with an API token
   ([create one here](https://id.atlassian.com/manage-profile/security/api-tokens))
 
 ## Setup
@@ -27,7 +27,7 @@ eventually GitLab).
 
    Edit `.env`:
 
-   ```
+   ```env
    JIRA_URL=https://amfament.atlassian.net
    JIRA_EMAIL=your.email@amfam.com
    JIRA_API_TOKEN=your-api-token-here
@@ -53,7 +53,7 @@ uv run jyy-amfam-toolkit branch
 
 This will:
 
-1. Fetch your Jira tickets (assigned to you, not `Done`).
+1. Fetch your Jira tickets (with jql filter set in code)
 2. Prompt you to select a ticket.
 3. Prompt you to select a [conventional branch](https://conventional-branch.github.io/)
    type (`feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`, `build`,
