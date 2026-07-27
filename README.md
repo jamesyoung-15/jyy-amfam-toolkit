@@ -8,7 +8,7 @@ eventually GitLab) that I use at work.
 - Python >= 3.13
 - [uv](https://docs.astral.sh/uv/) installed
 - `git` available on your PATH
-- A Jira Cloud account with an API token
+- An Atlassian Cloud account with an API token
   ([create one here](https://id.atlassian.com/manage-profile/security/api-tokens))
 
 ## Setup
@@ -20,7 +20,7 @@ eventually GitLab) that I use at work.
    ```
 
 2. Copy the example env file to `~/.config/jyy-amfam-toolkit/.env` and fill
-   in your Jira credentials:
+   in your Atlassian credentials:
 
    ```bash
    mkdir -p ~/.config/jyy-amfam-toolkit
