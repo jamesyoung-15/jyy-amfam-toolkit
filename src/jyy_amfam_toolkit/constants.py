@@ -45,7 +45,7 @@ CONVENTIONAL_BRANCH_TYPES = [
 
 # --- Slugs ---
 
-SLUG_MAX_LENGTH = 40
+SLUG_MAX_LENGTH = 100
 
 # --- Config file location ---
 
