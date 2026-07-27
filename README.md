@@ -86,15 +86,16 @@ jyy-amfam-toolkit branch
 
 ## Development
 
-Lint with [ruff](https://docs.astral.sh/ruff/):
+Make sure to have `pre-commit`. Add `pre-commit` hook:
 
 ```bash
-uv run ruff check .
+pre-commit install
 ```
 
-Run the test suite with [pytest](https://docs.pytest.org/):
+This runs `ruff` lint and format checks on git commits.
+
+For unit testing, run:
 
 ```bash
 uv run pytest
 ```
-
