@@ -1,7 +1,7 @@
 # jyy-amfam-toolkit
 
 Personal CLI for automating recurring dev workflow tasks (Jira, git, and
-eventually GitLab).
+eventually GitLab) that I use at work.
 
 ## Prerequisites
 
