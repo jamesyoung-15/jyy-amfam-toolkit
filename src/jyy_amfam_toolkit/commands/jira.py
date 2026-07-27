@@ -26,8 +26,12 @@ def _open_ticket_url(jira_url: str, ticket_key: str) -> None:
     webbrowser.open(url)
 
 
+@jira_app.command(name="list")
 @jira_app.command(name="open")
 def open_command(
+    all_tickets: bool = typer.Option(
+        False, "--all", help="List all tickets assigned to you regardless of status."
+    ),
     branch: bool = typer.Option(
         False,
         "--branch",
@@ -72,7 +76,8 @@ def open_command(
     client = JiraClient(settings)
     typer.echo("Fetching Jira tickets...")
     try:
-        issues = client.search_issues(JIRA_OPEN_JQL)
+        jql = "assignee = currentUser()" if all_tickets else JIRA_OPEN_JQL
+        issues = client.search_issues(jql)
     except httpx.HTTPError as exc:
         typer.secho(
             f"Error fetching Jira tickets: {exc}", fg=typer.colors.RED, err=True
