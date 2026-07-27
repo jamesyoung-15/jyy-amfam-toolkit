@@ -8,7 +8,7 @@ from jyy_amfam_toolkit.core.jira_client import Issue, JiraClient
 from jyy_amfam_toolkit.core.slugs import make_slug
 from jyy_amfam_toolkit.settings import Settings
 
-JQL = 'assignee = currentUser() AND status != Done ORDER BY updated DESC'
+JQL = "assignee = currentUser() AND status != Done ORDER BY updated DESC"
 
 BRANCH_TYPES = [
     "feat",
@@ -53,7 +53,9 @@ def branch_command() -> None:
     try:
         issues = client.search_issues(JQL)
     except Exception as exc:
-        typer.secho(f"Error fetching Jira tickets: {exc}", fg=typer.colors.RED, err=True)
+        typer.secho(
+            f"Error fetching Jira tickets: {exc}", fg=typer.colors.RED, err=True
+        )
         raise typer.Exit(code=1)
 
     if not issues:
@@ -82,7 +84,11 @@ def branch_command() -> None:
         raise typer.Exit(code=1)
     slug = slug.strip()
 
-    branch_name = f"{branch_type}/{selected_issue.key}-{slug}" if slug else f"{branch_type}/{selected_issue.key}"
+    branch_name = (
+        f"{branch_type}/{selected_issue.key}-{slug}"
+        if slug
+        else f"{branch_type}/{selected_issue.key}"
+    )
 
     if git_utils.branch_exists(branch_name):
         checkout = questionary.confirm(
@@ -96,7 +102,9 @@ def branch_command() -> None:
         except git_utils.GitError as exc:
             typer.secho(f"Error: {exc}", fg=typer.colors.RED, err=True)
             raise typer.Exit(code=1)
-        typer.secho(f"Checked out existing branch: {branch_name}", fg=typer.colors.GREEN)
+        typer.secho(
+            f"Checked out existing branch: {branch_name}", fg=typer.colors.GREEN
+        )
         return
 
     try:

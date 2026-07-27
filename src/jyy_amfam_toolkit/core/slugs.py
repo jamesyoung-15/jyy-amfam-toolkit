@@ -15,6 +15,4 @@ def make_slug(text: str, max_length: int = DEFAULT_MAX_LENGTH) -> str:
     Returns:
         A slug suitable for use in a git branch name.
     """
-    return slugify(
-        text, max_length=max_length, word_boundary=True, save_order=True
-    )
+    return slugify(text, max_length=max_length, word_boundary=True, save_order=True)

@@ -58,9 +58,7 @@ class JiraClient:
                 if next_page_token:
                     params["nextPageToken"] = next_page_token
 
-                response = client.get(
-                    f"{self._base_url}{SEARCH_PATH}", params=params
-                )
+                response = client.get(f"{self._base_url}{SEARCH_PATH}", params=params)
                 response.raise_for_status()
                 data = response.json()
 
