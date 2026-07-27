@@ -31,7 +31,5 @@ Future automations planned for this toolkit. Not yet implemented.
 
 ## Other ideas (not yet scoped)
 
-- `jyy jira open` — open the Jira ticket for the current branch in the
-  browser (parse ticket key from branch name, build URL from `JIRA_URL`)
 - Optionally transition the Jira ticket status when creating a branch
   (e.g. auto move to "In Progress")

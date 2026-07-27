@@ -70,6 +70,23 @@ This will:
 If the branch already exists locally, you'll be prompted to check it out
 instead of erroring.
 
+### `jira open` — open a Jira ticket in the browser
+
+```bash
+uv run jyy-amfam-toolkit jira open
+```
+
+Fetches your Jira tickets (assigned to you, excluding Done/Cancelled),
+prompts you to select one, and opens it in your default browser.
+
+Use `--branch` to skip the prompt and open the ticket referenced by the
+current git branch name instead (e.g. `feat/EITDC-7022-my-slug` opens
+`EITDC-7022`). Must be run from inside a git repository:
+
+```bash
+uv run jyy-amfam-toolkit jira open --branch
+```
+
 ## Optional: install globally
 
 To run the CLI without prefixing `uv run` every time:
