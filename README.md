@@ -19,13 +19,15 @@ eventually GitLab).
    uv sync
    ```
 
-2. Copy the example env file and fill in your Jira credentials:
+2. Copy the example env file to `~/.config/jyy-amfam-toolkit/.env` and fill
+   in your Jira credentials:
 
    ```bash
-   cp .env.example .env
+   mkdir -p ~/.config/jyy-amfam-toolkit
+   cp .env.example ~/.config/jyy-amfam-toolkit/.env
    ```
 
-   Edit `.env`:
+   Edit `~/.config/jyy-amfam-toolkit/.env`:
 
    ```env
    JIRA_URL=https://amfament.atlassian.net
@@ -33,7 +35,10 @@ eventually GitLab).
    JIRA_API_TOKEN=your-api-token-here
    ```
 
-   `.env` is gitignored and never committed.
+   This fixed location (rather than a `.env` in the project directory) is
+   used so the CLI works the same regardless of which directory you run it
+   from after a global install. This file is outside the repo and never
+   committed.
 
 ## Usage
 

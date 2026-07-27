@@ -1,15 +1,23 @@
 """Typed configuration loaded from environment variables / .env file."""
 
+from pathlib import Path
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+CONFIG_DIR = Path.home() / ".config" / "jyy-amfam-toolkit"
+ENV_FILE = CONFIG_DIR / ".env"
 
 
 class Settings(BaseSettings):
     """Jira Cloud connection settings.
 
-    Values are loaded from environment variables first, falling back to a
-    local `.env` file (see `.env.example` for the expected keys). Never
-    commit a real `.env` file to version control.
+    Values are loaded from environment variables first, falling back to
+    `~/.config/jyy-amfam-toolkit/.env` (see `.env.example` in the repo for
+    the expected keys). This fixed location is used (rather than a relative
+    `.env` in the current directory) so the CLI works the same regardless
+    of which directory it's run from after a global `uv tool install`.
+    Never commit a real `.env` file to version control.
     """
 
     jira_url: str = Field(
@@ -23,7 +31,7 @@ class Settings(BaseSettings):
     )
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_FILE),
         env_file_encoding="utf-8",
         extra="ignore",
     )

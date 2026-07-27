@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from jyy_amfam_toolkit.core import git_utils
 from jyy_amfam_toolkit.core.jira_client import Issue, JiraClient
 from jyy_amfam_toolkit.core.slugs import make_slug
-from jyy_amfam_toolkit.settings import Settings
+from jyy_amfam_toolkit.settings import ENV_FILE, Settings
 
 JQL = "assignee = currentUser() AND status != Done ORDER BY updated DESC"
 
@@ -43,7 +43,8 @@ def branch_command() -> None:
     except ValidationError as exc:
         typer.secho(
             "Error: missing or invalid Jira configuration.\n"
-            "Copy .env.example to .env and fill in your Jira credentials.\n"
+            f"Create {ENV_FILE} with your Jira credentials "
+            "(see .env.example in the repo for the expected format).\n"
             f"\nDetails:\n{exc}",
             fg=typer.colors.RED,
             err=True,
