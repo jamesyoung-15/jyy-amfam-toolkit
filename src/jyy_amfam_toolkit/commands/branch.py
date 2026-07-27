@@ -8,7 +8,7 @@ from jyy_amfam_toolkit.core.jira_client import Issue, JiraClient
 from jyy_amfam_toolkit.core.slugs import make_slug
 from jyy_amfam_toolkit.settings import Settings
 
-DEFAULT_JQL = 'assignee = currentUser() AND status = "In Progress" ORDER BY updated DESC'
+JQL = 'assignee = currentUser() AND status != Done ORDER BY updated DESC'
 
 BRANCH_TYPES = [
     "feat",
@@ -28,13 +28,7 @@ def _format_issue_choice(issue: Issue) -> str:
     return f"{issue.key} - {issue.summary}"
 
 
-def branch_command(
-    jql: str = typer.Option(
-        DEFAULT_JQL,
-        "--jql",
-        help="JQL query used to list candidate Jira tickets.",
-    ),
-) -> None:
+def branch_command() -> None:
     """Create a git branch from a Jira ticket using a conventional-branch prefix."""
     if not git_utils.is_git_repo():
         typer.secho(
@@ -57,7 +51,7 @@ def branch_command(
     client = JiraClient(settings)
     typer.echo("Fetching Jira tickets...")
     try:
-        issues = client.search_issues(jql)
+        issues = client.search_issues(JQL)
     except Exception as exc:
         typer.secho(f"Error fetching Jira tickets: {exc}", fg=typer.colors.RED, err=True)
         raise typer.Exit(code=1)
