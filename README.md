@@ -3,6 +3,10 @@
 Personal CLI for automating recurring dev workflow tasks (Jira, git, and
 eventually GitLab) that I use at work.
 
+Example:
+
+![Jira Branch Demo](./examples/jira-branch-demo.gif)
+
 ## Prerequisites
 
 - Python >= 3.13
