@@ -6,6 +6,12 @@ from jyy_amfam_toolkit.commands.branch import branch_command
 
 app = typer.Typer(help="Personal dev workflow automation toolkit.")
 
+
+@app.callback()
+def main() -> None:
+    """Personal dev workflow automation toolkit."""
+
+
 app.command(name="branch")(branch_command)
 
 
