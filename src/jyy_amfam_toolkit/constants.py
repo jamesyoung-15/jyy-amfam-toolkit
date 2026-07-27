@@ -15,7 +15,7 @@ JIRA_REQUEST_TIMEOUT_SECONDS = 15.0
 # --- `branch` command ---
 
 # JQL used to list candidate tickets for the `branch` command.
-BRANCH_JQL = "assignee = currentUser() AND status != Done ORDER BY updated DESC"
+BRANCH_JQL = "assignee = currentUser() AND status NOT IN (Done,Cancelled,Waiting) ORDER BY updated DESC"
 
 # Conventional branch (https://conventional-branch.github.io/) type prefixes
 # offered when creating a branch.
