@@ -99,3 +99,16 @@ def test_checkout_branch_switches_to_existing_branch(temp_git_repo: Path) -> Non
 def test_checkout_branch_raises_on_unknown_branch(temp_git_repo: Path) -> None:
     with pytest.raises(git_utils.GitError):
         git_utils.checkout_branch("does-not-exist")
+
+
+def test_current_branch_returns_checked_out_branch_name(temp_git_repo: Path) -> None:
+    git_utils.create_branch("feat/TEST-123-my-slug")
+    assert git_utils.current_branch() == "feat/TEST-123-my-slug"
+
+
+def test_current_branch_reflects_checkout_switch(temp_git_repo: Path) -> None:
+    initial_branch = git_utils.current_branch()
+    git_utils.create_branch("feat/TEST-123-my-slug")
+    git_utils.checkout_branch(initial_branch)
+
+    assert git_utils.current_branch() == initial_branch

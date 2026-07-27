@@ -18,6 +18,21 @@ def is_git_repo() -> bool:
     return result.returncode == 0 and result.stdout.strip() == "true"
 
 
+def current_branch() -> str:
+    """Return the name of the currently checked-out branch.
+
+    Returns an empty string if in a detached HEAD state (no branch
+    checked out).
+    """
+    result = subprocess.run(
+        ["git", "branch", "--show-current"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout.strip()
+
+
 def branch_exists(name: str) -> bool:
     """Return True if a local branch with the given name already exists."""
     result = subprocess.run(
