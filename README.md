@@ -44,6 +44,20 @@ Example:
    from after a global install. This file is outside the repo and never
    committed.
 
+## Optional: install globally
+
+To run the CLI without prefixing `uv run` every time and from any directory:
+
+```bash
+uv tool install --editable .
+```
+
+Then use it directly:
+
+```bash
+jyy-amfam-toolkit branch
+```
+
 ## Usage
 
 Run commands via `uv run`:
@@ -89,20 +103,6 @@ current git branch name instead (e.g. `feat/EITDC-7022-my-slug` opens
 
 ```bash
 uv run jyy-amfam-toolkit jira open --branch
-```
-
-## Optional: install globally
-
-To run the CLI without prefixing `uv run` every time:
-
-```bash
-uv tool install --editable .
-```
-
-Then use it directly:
-
-```bash
-jyy-amfam-toolkit branch
 ```
 
 ## Development
