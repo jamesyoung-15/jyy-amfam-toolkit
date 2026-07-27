@@ -26,9 +26,7 @@ def temp_git_repo(tmp_path: Path) -> Generator[Path]:
     os.chdir(repo_dir)
     try:
         subprocess.run(["git", "init", "-q"], check=True)
-        subprocess.run(
-            ["git", "config", "user.email", "test@example.com"], check=True
-        )
+        subprocess.run(["git", "config", "user.email", "test@example.com"], check=True)
         subprocess.run(["git", "config", "user.name", "Test User"], check=True)
         (repo_dir / "README.md").write_text("test\n")
         subprocess.run(["git", "add", "README.md"], check=True)
