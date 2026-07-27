@@ -1,7 +1,7 @@
 """The `branch` command: pick a Jira ticket and create a conventional git branch."""
 
-import typer
 import questionary
+import typer
 
 from jyy_amfam_toolkit.core import git_utils
 from jyy_amfam_toolkit.core.jira_client import Issue, JiraClient
