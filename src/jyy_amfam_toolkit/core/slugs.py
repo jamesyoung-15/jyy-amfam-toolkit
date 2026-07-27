@@ -2,10 +2,10 @@
 
 from slugify import slugify
 
-DEFAULT_MAX_LENGTH = 40
+from jyy_amfam_toolkit.constants import SLUG_MAX_LENGTH
 
 
-def make_slug(text: str, max_length: int = DEFAULT_MAX_LENGTH) -> str:
+def make_slug(text: str, max_length: int = SLUG_MAX_LENGTH) -> str:
     """Convert free text into a lowercase, hyphenated, length-limited slug.
 
     Args:

@@ -5,25 +5,11 @@ import questionary
 import typer
 from pydantic import ValidationError
 
+from jyy_amfam_toolkit.constants import BRANCH_JQL, CONVENTIONAL_BRANCH_TYPES, ENV_FILE
 from jyy_amfam_toolkit.core import git_utils
 from jyy_amfam_toolkit.core.jira_client import Issue, JiraClient
 from jyy_amfam_toolkit.core.slugs import make_slug
-from jyy_amfam_toolkit.settings import ENV_FILE, Settings
-
-JQL = "assignee = currentUser() AND status != Done ORDER BY updated DESC"
-
-BRANCH_TYPES = [
-    "feat",
-    "fix",
-    "chore",
-    "docs",
-    "style",
-    "refactor",
-    "test",
-    "build",
-    "ci",
-    "perf",
-]
+from jyy_amfam_toolkit.settings import Settings
 
 
 def _format_issue_choice(issue: Issue) -> str:
@@ -54,7 +40,7 @@ def branch_command() -> None:
     client = JiraClient(settings)
     typer.echo("Fetching Jira tickets...")
     try:
-        issues = client.search_issues(JQL)
+        issues = client.search_issues(BRANCH_JQL)
     except httpx.HTTPError as exc:
         typer.secho(
             f"Error fetching Jira tickets: {exc}", fg=typer.colors.RED, err=True
@@ -76,7 +62,7 @@ def branch_command() -> None:
     ]
 
     branch_type = questionary.select(
-        "Select a branch type:", choices=BRANCH_TYPES
+        "Select a branch type:", choices=CONVENTIONAL_BRANCH_TYPES
     ).ask()
     if branch_type is None:
         raise typer.Exit(code=1)

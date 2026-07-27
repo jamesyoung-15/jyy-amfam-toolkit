@@ -6,7 +6,8 @@ import pytest
 from pydantic import ValidationError
 from pydantic_settings import SettingsConfigDict
 
-from jyy_amfam_toolkit.settings import CONFIG_DIR, ENV_FILE, Settings
+from jyy_amfam_toolkit.constants import CONFIG_DIR, ENV_FILE
+from jyy_amfam_toolkit.settings import Settings
 
 
 def test_env_file_is_absolute_path_under_home_config_dir() -> None:

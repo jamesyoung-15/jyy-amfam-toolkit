@@ -9,10 +9,8 @@ from dataclasses import dataclass
 
 import httpx
 
+from jyy_amfam_toolkit.constants import JIRA_REQUEST_TIMEOUT_SECONDS, JIRA_SEARCH_PATH
 from jyy_amfam_toolkit.settings import Settings
-
-SEARCH_PATH = "/rest/api/3/search/jql"
-DEFAULT_TIMEOUT = 15.0
 
 
 @dataclass(frozen=True)
@@ -47,7 +45,9 @@ class JiraClient:
         issues: list[Issue] = []
         next_page_token: str | None = None
 
-        with httpx.Client(auth=self._auth, timeout=DEFAULT_TIMEOUT) as client:
+        with httpx.Client(
+            auth=self._auth, timeout=JIRA_REQUEST_TIMEOUT_SECONDS
+        ) as client:
             while len(issues) < max_results:
                 page_size = min(50, max_results - len(issues))
                 params: dict[str, str | int] = {
@@ -58,7 +58,9 @@ class JiraClient:
                 if next_page_token:
                     params["nextPageToken"] = next_page_token
 
-                response = client.get(f"{self._base_url}{SEARCH_PATH}", params=params)
+                response = client.get(
+                    f"{self._base_url}{JIRA_SEARCH_PATH}", params=params
+                )
                 response.raise_for_status()
                 data = response.json()
 

@@ -1,12 +1,9 @@
 """Typed configuration loaded from environment variables / .env file."""
 
-from pathlib import Path
-
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-CONFIG_DIR = Path.home() / ".config" / "jyy-amfam-toolkit"
-ENV_FILE = CONFIG_DIR / ".env"
+from jyy_amfam_toolkit.constants import ENV_FILE
 
 
 class Settings(BaseSettings):
