@@ -1,7 +1,9 @@
 """The `branch` command: pick a Jira ticket and create a conventional git branch."""
 
+import httpx
 import questionary
 import typer
+from pydantic import ValidationError
 
 from jyy_amfam_toolkit.core import git_utils
 from jyy_amfam_toolkit.core.jira_client import Issue, JiraClient
@@ -38,7 +40,7 @@ def branch_command() -> None:
 
     try:
         settings = Settings()
-    except Exception as exc:
+    except ValidationError as exc:
         typer.secho(
             "Error: missing or invalid Jira configuration.\n"
             "Copy .env.example to .env and fill in your Jira credentials.\n"
@@ -52,7 +54,7 @@ def branch_command() -> None:
     typer.echo("Fetching Jira tickets...")
     try:
         issues = client.search_issues(JQL)
-    except Exception as exc:
+    except httpx.HTTPError as exc:
         typer.secho(
             f"Error fetching Jira tickets: {exc}", fg=typer.colors.RED, err=True
         )

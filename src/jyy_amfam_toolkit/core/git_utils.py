@@ -13,6 +13,7 @@ def is_git_repo() -> bool:
         ["git", "rev-parse", "--is-inside-work-tree"],
         capture_output=True,
         text=True,
+        check=False,
     )
     return result.returncode == 0 and result.stdout.strip() == "true"
 
@@ -22,6 +23,7 @@ def branch_exists(name: str) -> bool:
     result = subprocess.run(
         ["git", "show-ref", "--verify", "--quiet", f"refs/heads/{name}"],
         capture_output=True,
+        check=False,
     )
     return result.returncode == 0
 
@@ -36,6 +38,7 @@ def create_branch(name: str) -> None:
         ["git", "checkout", "-b", name],
         capture_output=True,
         text=True,
+        check=False,
     )
     if result.returncode != 0:
         raise GitError(result.stderr.strip() or "git checkout -b failed")
@@ -51,6 +54,7 @@ def checkout_branch(name: str) -> None:
         ["git", "checkout", name],
         capture_output=True,
         text=True,
+        check=False,
     )
     if result.returncode != 0:
         raise GitError(result.stderr.strip() or "git checkout failed")
