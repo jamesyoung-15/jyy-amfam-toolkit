@@ -91,3 +91,10 @@ Lint with [ruff](https://docs.astral.sh/ruff/):
 ```bash
 uv run ruff check .
 ```
+
+Run the test suite with [pytest](https://docs.pytest.org/):
+
+```bash
+uv run pytest
+```
+
