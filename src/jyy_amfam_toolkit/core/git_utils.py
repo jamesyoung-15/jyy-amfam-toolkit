@@ -1,6 +1,7 @@
 """Small helpers for git branch operations, shelling out to the git CLI."""
 
 import subprocess
+from pathlib import Path
 
 
 class GitError(Exception):
@@ -92,3 +93,48 @@ def get_remote_url(remote_name: str = "origin") -> str | None:
         return None
 
     return result.stdout.strip()
+
+
+def repo_root() -> Path | None:
+    """Return the top-level directory of the current git repository.
+
+    Returns None if not inside a git repository.
+    """
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    if result.returncode != 0:
+        return None
+
+    return Path(result.stdout.strip())
+
+
+def has_upstream(branch: str) -> bool:
+    """Return True if the given branch has a remote tracking branch."""
+    result = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", f"{branch}@{{upstream}}"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.returncode == 0
+
+
+def push_branch(branch: str, remote: str = "origin") -> None:
+    """Push a branch to a remote, setting it as the upstream tracking branch.
+
+    Raises:
+        GitError: If the git command fails.
+    """
+    result = subprocess.run(
+        ["git", "push", "--set-upstream", remote, branch],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise GitError(result.stderr.strip() or "git push failed")

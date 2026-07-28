@@ -66,6 +66,41 @@ def temp_git_repo_no_remote(tmp_path: Path) -> Generator[Path]:
         os.chdir(original_cwd)
 
 
+@pytest.fixture
+def temp_git_repo_with_pushable_remote(tmp_path: Path) -> Generator[Path]:
+    """Create a temp git repo with a local bare repo configured as origin.
+
+    Used for testing push_branch/has_upstream against a real, pushable
+    remote without touching an actual GitLab/GitHub server.
+    """
+    bare_repo_dir = tmp_path / "bare-remote.git"
+    subprocess.run(["git", "init", "-q", "--bare", str(bare_repo_dir)], check=True)
+
+    repo_dir = tmp_path / "repo-with-remote"
+    repo_dir.mkdir()
+
+    original_cwd = Path.cwd()
+    os.chdir(repo_dir)
+    try:
+        subprocess.run(["git", "init", "-q"], check=True)
+        subprocess.run(["git", "config", "user.email", "test@example.com"], check=True)
+        subprocess.run(["git", "config", "user.name", "Test User"], check=True)
+        (repo_dir / "README.md").write_text("test\n")
+        subprocess.run(["git", "add", "README.md"], check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "initial commit"], check=True)
+        subprocess.run(
+            ["git", "remote", "add", "origin", str(bare_repo_dir)], check=True
+        )
+        subprocess.run(
+            ["git", "push", "--set-upstream", "origin", "HEAD"],
+            check=True,
+            capture_output=True,
+        )
+        yield repo_dir
+    finally:
+        os.chdir(original_cwd)
+
+
 def test_is_git_repo_true_inside_repo(temp_git_repo: Path) -> None:
     assert git_utils.is_git_repo() is True
 
@@ -170,3 +205,47 @@ def test_get_remote_url_supports_non_default_remote_name(temp_git_repo: Path) ->
         check=True,
     )
     assert git_utils.get_remote_url("upstream") == "https://github.com/user/repo.git"
+
+
+def test_repo_root_returns_top_level_directory(temp_git_repo: Path) -> None:
+    assert git_utils.repo_root() == temp_git_repo.resolve()
+
+
+def test_repo_root_returns_none_outside_repo(tmp_path: Path) -> None:
+    non_repo_dir = tmp_path / "not-a-repo"
+    non_repo_dir.mkdir()
+
+    original_cwd = Path.cwd()
+    os.chdir(non_repo_dir)
+    try:
+        assert git_utils.repo_root() is None
+    finally:
+        os.chdir(original_cwd)
+
+
+def test_has_upstream_true_for_pushed_branch(
+    temp_git_repo_with_pushable_remote: Path,
+) -> None:
+    current = git_utils.current_branch()
+    assert git_utils.has_upstream(current) is True
+
+
+def test_has_upstream_false_for_local_only_branch(temp_git_repo: Path) -> None:
+    git_utils.create_branch("feat/TEST-123-my-slug")
+    assert git_utils.has_upstream("feat/TEST-123-my-slug") is False
+
+
+def test_push_branch_sets_upstream(
+    temp_git_repo_with_pushable_remote: Path,
+) -> None:
+    git_utils.create_branch("feat/TEST-123-my-slug")
+    assert git_utils.has_upstream("feat/TEST-123-my-slug") is False
+
+    git_utils.push_branch("feat/TEST-123-my-slug")
+
+    assert git_utils.has_upstream("feat/TEST-123-my-slug") is True
+
+
+def test_push_branch_raises_for_unknown_remote(temp_git_repo: Path) -> None:
+    with pytest.raises(git_utils.GitError):
+        git_utils.push_branch("main", remote="does-not-exist")
