@@ -51,16 +51,18 @@ Example:
    from after a global install. This file is outside the repo and never
    committed.
 
-3. (Optional, for `dev-servers` commands) Copy the example config file to
-   `~/.config/jyy-amfam-toolkit/config.json` and fill in your own servers:
+3. (Optional, for `dev-servers` and `bookmarks` commands) Copy the example
+   config file to `~/.config/jyy-amfam-toolkit/config.json` and fill in
+   your own servers/bookmarks:
 
    ```bash
    cp config.example.json ~/.config/jyy-amfam-toolkit/config.json
    ```
 
    Unlike `.env`, this file has no secrets — it's plain user-defined data
-   (dev server addresses, your AD username for `ssh` command generation).
-   Edit it directly in a text editor; there's no CLI command to add entries.
+   (dev server addresses, URL bookmarks, your AD username for `ssh` command
+   generation). Edit it directly in a text editor; there's no CLI command
+   to add entries.
 
 ## Optional: install globally
 
@@ -209,6 +211,22 @@ uv run jyy-amfam-toolkit dev-servers ssh
 Prompts you to select a server, then prints an `ssh` command to connect
 (using `ad_username` from `config.json` if set, e.g. `ssh jyoung@10.0.0.5`).
 This only prints the command for you to copy — it doesn't launch a session.
+
+### `bookmarks open` — open a URL bookmark in the browser
+
+Requires `~/.config/jyy-amfam-toolkit/config.json` with a `bookmarks` list
+(see Setup above). If missing or empty, prints the expected format and
+exits cleanly.
+
+```bash
+uv run jyy-amfam-toolkit bookmarks open
+```
+
+Prompts you to select a bookmark and opens it in your default browser.
+Bookmarks can optionally be grouped under a `folder` (one level deep, e.g.
+`"folder": "Datadog"`), shown as `[Datadog] Prod Dashboard` in the list.
+Top-level bookmarks (no folder) are listed first, followed by folder
+groups sorted alphabetically.
 
 ## Development
 
