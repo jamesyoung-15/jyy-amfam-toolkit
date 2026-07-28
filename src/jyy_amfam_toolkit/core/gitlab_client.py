@@ -34,6 +34,17 @@ class MergeRequest:
     web_url: str
 
 
+@dataclass(frozen=True)
+class MergeRequestSummary:
+    """A minimal representation of an existing GitLab merge request."""
+
+    iid: int
+    title: str
+    target_branch: str
+    state: str
+    web_url: str
+
+
 class GitlabClient:
     """Client for GitLab projects, branches, and merge requests."""
 
@@ -92,6 +103,36 @@ class GitlabClient:
                 page += 1
 
         return branches
+
+    def list_merge_requests_for_branch(
+        self, project_id: int, source_branch: str
+    ) -> list[MergeRequestSummary]:
+        """List merge requests with the given source branch.
+
+        Includes merge requests in any state (opened, closed, merged).
+
+        Raises:
+            httpx.HTTPStatusError: If the GitLab API returns an error
+                status.
+        """
+        with self._client() as client:
+            response = client.get(
+                f"{self._base_url}/projects/{project_id}/merge_requests",
+                params={"source_branch": source_branch, "state": "all"},
+            )
+            response.raise_for_status()
+            data = response.json()
+
+        return [
+            MergeRequestSummary(
+                iid=mr["iid"],
+                title=mr.get("title", ""),
+                target_branch=mr.get("target_branch", ""),
+                state=mr.get("state", ""),
+                web_url=mr["web_url"],
+            )
+            for mr in data
+        ]
 
     def create_merge_request(
         self,
