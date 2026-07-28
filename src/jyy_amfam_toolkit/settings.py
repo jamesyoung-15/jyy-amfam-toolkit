@@ -1,6 +1,6 @@
 """Typed configuration loaded from environment variables / .env file."""
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from jyy_amfam_toolkit.constants import ENV_FILE
@@ -10,11 +10,8 @@ class Settings(BaseSettings):
     """Jira Cloud connection settings.
 
     Values are loaded from environment variables first, falling back to
-    `~/.config/jyy-amfam-toolkit/.env` (see `.env.example` in the repo for
-    the expected keys). This fixed location is used (rather than a relative
-    `.env` in the current directory) so the CLI works the same regardless
+    `~/.config/jyy-amfam-toolkit/.env`. This fixed location is used so the CLI works the same regardless
     of which directory it's run from after a global `uv tool install`.
-    Never commit a real `.env` file to version control.
     """
 
     jira_url: str = Field(
@@ -48,6 +45,13 @@ class GitlabSettings(BaseSettings):
     gitlab_token: str = Field(
         description="GitLab personal access token with 'api' scope"
     )
+
+    @field_validator("gitlab_url")
+    @classmethod
+    def _ensure_scheme(cls, value: str) -> str:
+        if not value.startswith(("http://", "https://")):
+            return f"https://{value}"
+        return value
 
     model_config = SettingsConfigDict(
         env_file=str(ENV_FILE),

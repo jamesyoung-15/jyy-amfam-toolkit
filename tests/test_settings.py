@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from pydantic_settings import SettingsConfigDict
 
 from jyy_amfam_toolkit.constants import CONFIG_DIR, ENV_FILE
-from jyy_amfam_toolkit.settings import Settings
+from jyy_amfam_toolkit.settings import GitlabSettings, Settings
 
 
 def test_env_file_is_absolute_path_under_home_config_dir() -> None:
@@ -102,3 +102,62 @@ def test_environment_variables_take_priority_over_env_file(
     settings = FileSettings()
 
     assert settings.jira_url == "https://fromenv.atlassian.net"
+
+
+def test_gitlab_settings_defaults_to_gitlab_com(monkeypatch) -> None:
+    monkeypatch.delenv("GITLAB_URL", raising=False)
+    monkeypatch.setenv("GITLAB_TOKEN", "secret-token")
+
+    class NoFileGitlabSettings(GitlabSettings):
+        model_config = SettingsConfigDict(
+            env_file="/nonexistent/path/.env", extra="ignore"
+        )
+
+    settings = NoFileGitlabSettings()
+
+    assert settings.gitlab_url == "https://gitlab.com"
+
+
+def test_gitlab_settings_requires_token(monkeypatch) -> None:
+    monkeypatch.delenv("GITLAB_TOKEN", raising=False)
+
+    class NoFileGitlabSettings(GitlabSettings):
+        model_config = SettingsConfigDict(
+            env_file="/nonexistent/path/.env", extra="ignore"
+        )
+
+    with pytest.raises(ValidationError):
+        NoFileGitlabSettings()
+
+
+def test_gitlab_settings_adds_https_scheme_if_missing(monkeypatch) -> None:
+    """Regression test.
+
+    A bare host (e.g. "gitlab.com", no scheme) previously caused httpx
+    requests to fail with "missing http:// or https:// protocol" errors.
+    """
+    monkeypatch.setenv("GITLAB_URL", "gitlab.example.com")
+    monkeypatch.setenv("GITLAB_TOKEN", "secret-token")
+
+    class NoFileGitlabSettings(GitlabSettings):
+        model_config = SettingsConfigDict(
+            env_file="/nonexistent/path/.env", extra="ignore"
+        )
+
+    settings = NoFileGitlabSettings()
+
+    assert settings.gitlab_url == "https://gitlab.example.com"
+
+
+def test_gitlab_settings_preserves_explicit_http_scheme(monkeypatch) -> None:
+    monkeypatch.setenv("GITLAB_URL", "http://internal-gitlab.example.com")
+    monkeypatch.setenv("GITLAB_TOKEN", "secret-token")
+
+    class NoFileGitlabSettings(GitlabSettings):
+        model_config = SettingsConfigDict(
+            env_file="/nonexistent/path/.env", extra="ignore"
+        )
+
+    settings = NoFileGitlabSettings()
+
+    assert settings.gitlab_url == "http://internal-gitlab.example.com"
