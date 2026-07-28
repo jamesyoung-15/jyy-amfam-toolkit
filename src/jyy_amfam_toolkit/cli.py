@@ -2,6 +2,7 @@
 
 import typer
 
+from jyy_amfam_toolkit.commands.bookmarks import bookmarks_app
 from jyy_amfam_toolkit.commands.branch import branch_command
 from jyy_amfam_toolkit.commands.dev_servers import dev_servers_app
 from jyy_amfam_toolkit.commands.glab import glab_app
@@ -17,6 +18,7 @@ def main() -> None:
 
 
 app.command(name="branch")(branch_command)
+app.add_typer(bookmarks_app, name="bookmarks")
 app.add_typer(dev_servers_app, name="dev-servers")
 app.add_typer(glab_app, name="glab")
 app.add_typer(jira_app, name="jira")
