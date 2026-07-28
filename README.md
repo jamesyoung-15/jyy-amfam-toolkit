@@ -222,11 +222,12 @@ exits cleanly.
 uv run jyy-amfam-toolkit bookmarks open
 ```
 
-Prompts you to select a bookmark and opens it in your default browser.
-Bookmarks can optionally be grouped under a `folder` (one level deep, e.g.
-`"folder": "Datadog"`), shown as `[Datadog] Prod Dashboard` in the list.
-Top-level bookmarks (no folder) are listed first, followed by folder
-groups sorted alphabetically.
+Prompts you to select a bookmark or folder. Bookmarks can optionally be
+grouped under a `folder` (one level deep, e.g. `"folder": "Datadog"`).
+Top-level bookmarks and folders are shown together in the first menu
+(folders as `[Datadog]`); selecting a folder navigates into a second menu
+listing just its bookmarks, with a "Back" option to return. Selecting a
+bookmark opens it in your default browser.
 
 ## Development
 

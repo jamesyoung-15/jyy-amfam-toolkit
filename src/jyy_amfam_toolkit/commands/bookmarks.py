@@ -10,27 +10,23 @@ from jyy_amfam_toolkit.core.config import Bookmark, ConfigError, load_config
 
 bookmarks_app = typer.Typer(help="Open user-defined URL bookmarks.")
 
+_BACK = "<- Back"
+
 
 def _error(message: str) -> None:
     typer.secho(message, fg=typer.colors.RED, err=True)
 
 
 def _format_bookmark_choice(bookmark: Bookmark) -> str:
-    label = f"[{bookmark.folder}] {bookmark.name}" if bookmark.folder else bookmark.name
+    label = bookmark.name
     if bookmark.description:
         label += f" - {bookmark.description}"
     return label
 
 
-def _sorted_bookmarks(bookmarks: list[Bookmark]) -> list[Bookmark]:
-    """Order bookmarks for display: top-level first (original order), then
-    remaining bookmarks grouped by folder name (alphabetical), preserving
-    original order within each folder.
-    """
-    top_level = [b for b in bookmarks if b.folder is None]
-    foldered = [b for b in bookmarks if b.folder is not None]
-    foldered.sort(key=lambda b: b.folder or "")
-    return top_level + foldered
+def _folder_names(bookmarks: list[Bookmark]) -> list[str]:
+    """Distinct folder names, alphabetically sorted."""
+    return sorted({b.folder for b in bookmarks if b.folder is not None})
 
 
 def _load_bookmarks() -> list[Bookmark] | None:
@@ -60,7 +56,45 @@ def _load_bookmarks() -> list[Bookmark] | None:
         )
         return None
 
-    return _sorted_bookmarks(config.bookmarks)
+    return config.bookmarks
+
+
+def _select_from_folder(bookmarks: list[Bookmark], folder: str) -> Bookmark | None:
+    """Prompt for a bookmark within a folder. Returns None on 'Back'."""
+    folder_bookmarks = [b for b in bookmarks if b.folder == folder]
+    choices = [_format_bookmark_choice(b) for b in folder_bookmarks] + [_BACK]
+
+    choice = questionary.select(f"[{folder}] Select a bookmark:", choices=choices).ask()
+    if choice is None or choice == _BACK:
+        return None
+
+    return folder_bookmarks[choices.index(choice)]
+
+
+def _select_bookmark(bookmarks: list[Bookmark]) -> Bookmark | None:
+    """Top-level navigation: pick a top-level bookmark, or drill into a folder."""
+    top_level = [b for b in bookmarks if b.folder is None]
+    folders = _folder_names(bookmarks)
+
+    while True:
+        top_level_choices = [_format_bookmark_choice(b) for b in top_level]
+        folder_choices = [f"[{folder}]" for folder in folders]
+        choices = top_level_choices + folder_choices
+
+        choice = questionary.select(
+            "Select a bookmark or folder:", choices=choices
+        ).ask()
+        if choice is None:
+            return None
+
+        if choice in folder_choices:
+            folder = folders[folder_choices.index(choice)]
+            bookmark = _select_from_folder(bookmarks, folder)
+            if bookmark is not None:
+                return bookmark
+            continue
+
+        return top_level[top_level_choices.index(choice)]
 
 
 @bookmarks_app.command(name="open")
@@ -70,11 +104,9 @@ def open_command() -> None:
     if bookmarks is None:
         raise typer.Exit(code=0)
 
-    choices = [_format_bookmark_choice(bookmark) for bookmark in bookmarks]
-    choice = questionary.select("Select a bookmark:", choices=choices).ask()
-    if choice is None:
+    bookmark = _select_bookmark(bookmarks)
+    if bookmark is None:
         raise typer.Exit(code=1)
 
-    bookmark = bookmarks[choices.index(choice)]
     typer.echo(bookmark.url)
     webbrowser.open(bookmark.url)
