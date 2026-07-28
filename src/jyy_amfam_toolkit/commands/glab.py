@@ -129,6 +129,61 @@ def _build_description(ticket_key: str | None, jira_settings: Settings | None) -
     return ""
 
 
+@mr_app.command(name="open")
+def open_command() -> None:
+    """Open the GitLab MR for the current branch in the browser."""
+    if not git_utils.is_git_repo():
+        _error("Error: not inside a git repository.")
+        raise typer.Exit(code=1)
+
+    gitlab_settings = _load_gitlab_settings()
+    if gitlab_settings is None:
+        raise typer.Exit(code=1)
+
+    project_path = _resolve_project_path()
+    if project_path is None:
+        raise typer.Exit(code=1)
+
+    branch = git_utils.current_branch()
+    if not branch:
+        _error("Error: no branch checked out (detached HEAD).")
+        raise typer.Exit(code=1)
+
+    client = GitlabClient(gitlab_settings)
+    try:
+        project = client.get_project(project_path)
+        merge_requests = client.list_merge_requests_for_branch(project.id, branch)
+    except httpx.HTTPError as exc:
+        _error(f"Error communicating with GitLab: {exc}")
+        raise typer.Exit(code=1)
+
+    if not merge_requests:
+        typer.echo(f"No merge requests found for branch '{branch}'.")
+        raise typer.Exit(code=0)
+
+    if len(merge_requests) == 1:
+        chosen = merge_requests[0]
+    else:
+        choice = questionary.select(
+            "Multiple merge requests found. Select one to open:",
+            choices=[
+                f"!{mr.iid} -> {mr.target_branch} [{mr.state}]: {mr.title}"
+                for mr in merge_requests
+            ],
+        ).ask()
+        if choice is None:
+            raise typer.Exit(code=1)
+        chosen = merge_requests[
+            [
+                f"!{mr.iid} -> {mr.target_branch} [{mr.state}]: {mr.title}"
+                for mr in merge_requests
+            ].index(choice)
+        ]
+
+    typer.echo(chosen.web_url)
+    webbrowser.open(chosen.web_url)
+
+
 @mr_app.command(name="create")
 def create_command(
     ready: bool = typer.Option(
