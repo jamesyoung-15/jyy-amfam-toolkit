@@ -51,6 +51,17 @@ Example:
    from after a global install. This file is outside the repo and never
    committed.
 
+3. (Optional, for `dev-servers` commands) Copy the example config file to
+   `~/.config/jyy-amfam-toolkit/config.json` and fill in your own servers:
+
+   ```bash
+   cp config.example.json ~/.config/jyy-amfam-toolkit/config.json
+   ```
+
+   Unlike `.env`, this file has no secrets — it's plain user-defined data
+   (dev server addresses, your AD username for `ssh` command generation).
+   Edit it directly in a text editor; there's no CLI command to add entries.
+
 ## Optional: install globally
 
 To run the CLI without prefixing `uv run` every time and from any directory:
@@ -171,6 +182,33 @@ Use `--ready` to create a ready-for-review MR instead:
 ```bash
 uv run jyy-amfam-toolkit glab mr create --ready
 ```
+
+### `dev-servers` — browse and check user-defined dev servers
+
+Requires `~/.config/jyy-amfam-toolkit/config.json` (see Setup above). If
+missing or empty, prints the expected format and exits cleanly.
+
+```bash
+uv run jyy-amfam-toolkit dev-servers list
+```
+
+Prompts you to select a server, then prints its full details (name,
+address, purpose, environment).
+
+```bash
+uv run jyy-amfam-toolkit dev-servers ping
+```
+
+Prompts you to select a server, then pings it and reports whether it's
+reachable.
+
+```bash
+uv run jyy-amfam-toolkit dev-servers ssh
+```
+
+Prompts you to select a server, then prints an `ssh` command to connect
+(using `ad_username` from `config.json` if set, e.g. `ssh jyoung@10.0.0.5`).
+This only prints the command for you to copy — it doesn't launch a session.
 
 ## Development
 
