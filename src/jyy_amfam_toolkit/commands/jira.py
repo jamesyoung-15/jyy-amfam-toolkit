@@ -41,7 +41,7 @@ def open_command(
 ) -> None:
     """Open a Jira ticket in the browser."""
     try:
-        settings = Settings()
+        settings = Settings()  # pyright: ignore[reportCallIssue]
     except ValidationError as exc:
         typer.secho(
             "Error: missing or invalid Jira configuration.\n"
