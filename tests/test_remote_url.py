@@ -2,7 +2,7 @@
 
 import pytest
 
-from jyy_amfam_toolkit.core.remote_url import to_web_url
+from jyy_amfam_toolkit.core.remote_url import extract_project_path, to_web_url
 
 
 @pytest.mark.parametrize(
@@ -85,3 +85,34 @@ def test_strips_surrounding_whitespace() -> None:
         to_web_url("  https://gitlab.com/user/repo.git  ")
         == "https://gitlab.com/user/repo"
     )
+
+
+@pytest.mark.parametrize(
+    ("remote_url", "expected"),
+    [
+        ("https://gitlab.com/user/repo.git", "user/repo"),
+        ("https://gitlab.com/group/subgroup/repo.git", "group/subgroup/repo"),
+        ("git@gitlab.com:user/repo.git", "user/repo"),
+        ("git@gitlab.com:group/subgroup/repo.git", "group/subgroup/repo"),
+        ("ssh://git@gitlab.com:22/user/repo.git", "user/repo"),
+        ("git@github.com:user/repo.git", "user/repo"),
+    ],
+)
+def test_extract_project_path_returns_namespaced_path(
+    remote_url: str, expected: str
+) -> None:
+    assert extract_project_path(remote_url) == expected
+
+
+@pytest.mark.parametrize(
+    "remote_url",
+    [
+        "",
+        "/Users/me/repos/my-repo",
+        "file:///Users/me/repos/my-repo.git",
+    ],
+)
+def test_extract_project_path_returns_none_for_unsupported_urls(
+    remote_url: str,
+) -> None:
+    assert extract_project_path(remote_url) is None

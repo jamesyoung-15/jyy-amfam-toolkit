@@ -78,3 +78,33 @@ def to_web_url(remote_url: str) -> str | None:
         return f"https://{host}/{_strip_git_suffix(path)}"
 
     return None
+
+
+# Matches the path portion after the host in a resolved web URL, e.g.
+# "https://gitlab.com/group/subgroup/project" -> "group/subgroup/project".
+_WEB_URL_PATH_RE = re.compile(r"^https?://[^/]+/(?P<path>.+)$")
+
+
+def extract_project_path(remote_url: str) -> str | None:
+    """Extract the 'namespace/project' path from a git remote URL.
+
+    Useful for building GitLab (or similar platform) API requests that
+    identify a project by its namespaced path, e.g.
+    "group/subgroup/project".
+
+    Args:
+        remote_url: A git remote URL, as returned by `git remote get-url`.
+
+    Returns:
+        The namespaced project path, or None if the remote URL isn't
+        recognized (see `to_web_url`).
+    """
+    web_url = to_web_url(remote_url)
+    if web_url is None:
+        return None
+
+    path_match = _WEB_URL_PATH_RE.match(web_url)
+    if not path_match:
+        return None
+
+    return path_match.group("path")
