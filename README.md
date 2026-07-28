@@ -1,7 +1,7 @@
 # jyy-amfam-toolkit
 
 Personal CLI for automating recurring dev workflow tasks (Jira, git, and
-eventually GitLab) that I use at work.
+GitLab) that I use at work.
 
 Example:
 
@@ -14,6 +14,9 @@ Example:
 - `git` available on your PATH
 - An Atlassian Cloud account with an API token
   ([create one here](https://id.atlassian.com/manage-profile/security/api-tokens))
+- (Optional, for `glab` commands) A GitLab account with a personal access
+  token with `api` scope
+  ([create one here](https://gitlab.com/-/user_settings/personal_access_tokens))
 
 ## Setup
 
@@ -24,7 +27,7 @@ Example:
    ```
 
 2. Copy the example env file to `~/.config/jyy-amfam-toolkit/.env` and fill
-   in your Atlassian credentials:
+   in your credentials:
 
    ```bash
    mkdir -p ~/.config/jyy-amfam-toolkit
@@ -37,6 +40,10 @@ Example:
    JIRA_URL=https://amfament.atlassian.net
    JIRA_EMAIL=your.email@amfam.com
    JIRA_API_TOKEN=your-api-token-here
+
+   # Optional, only needed for `glab` commands
+   GITLAB_URL=https://gitlab.com
+   GITLAB_TOKEN=your-gitlab-token-here
    ```
 
    This fixed location (rather than a `.env` in the project directory) is
@@ -103,6 +110,53 @@ current git branch name instead (e.g. `feat/EITDC-7022-my-slug` opens
 
 ```bash
 uv run jyy-amfam-toolkit jira open --branch
+```
+
+### `repo open` — open the current repository's remote page in the browser
+
+Must be run from inside a git repository.
+
+```bash
+uv run jyy-amfam-toolkit repo open
+```
+
+Resolves the `origin` remote (works for GitHub, GitLab, Bitbucket, or any
+other git host) and opens it in your default browser. Use `--remote` to
+target a different remote name:
+
+```bash
+uv run jyy-amfam-toolkit repo open --remote upstream
+```
+
+### `glab mr create` — create GitLab merge request(s) from the current branch
+
+Must be run from inside a git repository with a GitLab remote, and
+requires `GITLAB_TOKEN` to be configured.
+
+```bash
+uv run jyy-amfam-toolkit glab mr create
+```
+
+This will:
+
+1. Push the current branch if it hasn't been pushed yet (with confirmation).
+2. Fetch the project's branches from GitLab and prompt you to select one or
+   more target branches (the project's default branch is pre-selected).
+3. Build an MR title from the Jira ticket referenced in the branch name (if
+   any), falling back to a manual prompt otherwise.
+4. Use an existing `.gitlab/merge_request_templates/*.md` or
+   `.gitlab/merge_request_template.md` for the description if present
+   (prompting you to choose if multiple named templates exist); otherwise
+   generates a minimal description with a Jira ticket link.
+5. Create an MR against each selected target branch, printing the created
+   MR URL(s).
+6. Prompt to open the created MR(s) in your browser.
+
+MRs are created as **drafts** by default (title prefixed with `Draft: `).
+Use `--ready` to create a ready-for-review MR instead:
+
+```bash
+uv run jyy-amfam-toolkit glab mr create --ready
 ```
 
 ## Development
