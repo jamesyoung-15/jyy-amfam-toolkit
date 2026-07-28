@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from jyy_amfam_toolkit.core.config import ConfigError, DevServer, load_config
+from jyy_amfam_toolkit.core.config import Bookmark, ConfigError, DevServer, load_config
 
 
 def test_returns_none_when_file_does_not_exist(tmp_path: Path) -> None:
@@ -68,6 +68,69 @@ def test_dev_server_optional_fields_default_to_none(tmp_path: Path) -> None:
     assert config.dev_servers[0].environment is None
 
 
+def test_loads_bookmarks(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_text(
+        json.dumps(
+            {
+                "bookmarks": [
+                    {
+                        "name": "Company Wiki",
+                        "url": "https://wiki.example.com",
+                        "description": "internal wiki",
+                    },
+                    {
+                        "name": "Prod Dashboard",
+                        "url": "https://app.datadoghq.com/dashboard/prod",
+                        "folder": "Datadog",
+                    },
+                ]
+            }
+        )
+    )
+
+    config = load_config(config_path)
+
+    assert config is not None
+    assert config.bookmarks == [
+        Bookmark(
+            name="Company Wiki",
+            url="https://wiki.example.com",
+            description="internal wiki",
+            folder=None,
+        ),
+        Bookmark(
+            name="Prod Dashboard",
+            url="https://app.datadoghq.com/dashboard/prod",
+            description=None,
+            folder="Datadog",
+        ),
+    ]
+
+
+def test_bookmark_optional_fields_default_to_none(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_text(
+        json.dumps({"bookmarks": [{"name": "minimal", "url": "https://example.com"}]})
+    )
+
+    config = load_config(config_path)
+
+    assert config is not None
+    assert config.bookmarks[0].description is None
+    assert config.bookmarks[0].folder is None
+
+
+def test_raises_config_error_on_bookmark_missing_required_field(
+    tmp_path: Path,
+) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_text(json.dumps({"bookmarks": [{"name": "no-url"}]}))
+
+    with pytest.raises(ConfigError):
+        load_config(config_path)
+
+
 def test_raises_config_error_on_invalid_json(tmp_path: Path) -> None:
     config_path = tmp_path / "config.json"
     config_path.write_text("{not valid json")
@@ -94,7 +157,7 @@ def test_raises_config_error_on_wrong_type(tmp_path: Path) -> None:
 
 def test_example_config_file_is_valid() -> None:
     """Regression test: config.example.json must stay valid and in sync
-    with the DevServer/ToolkitConfig schema."""
+    with the DevServer/Bookmark/ToolkitConfig schema."""
     example_path = Path(__file__).parent.parent / "config.example.json"
 
     config = load_config(example_path)
@@ -102,3 +165,4 @@ def test_example_config_file_is_valid() -> None:
     assert config is not None
     assert config.ad_username is not None
     assert len(config.dev_servers) > 0
+    assert len(config.bookmarks) > 0
