@@ -4,20 +4,9 @@ Future automations planned for this toolkit. Not yet implemented.
 
 ## GitLab MR automation
 
-- Auto-create MR(s) from the current branch
-  - Client: [python-gitlab](https://python-gitlab.readthedocs.io/) (direct
-    REST API) — targeting gitlab.com
-  - Prompt interactively each run for which target branch(es) to create
-    MR(s) against (e.g. `main`, `test`) — no fixed global/per-repo config
-  - Auto-generate an MR description template, auto-linking the Jira ticket
-    (parsed from the current branch name, e.g.
-    `feat/EITDC-7022-my-slug` -> `EITDC-7022`)
-  - Open questions to resolve when building: MR title format, draft vs.
-    ready state, reviewer/assignee defaults, whether to respect an existing
-    `.gitlab/merge_request_templates/*.md` if present
-- `jyy mr open` — open the GitLab MR for the current branch in the browser
-  (find the MR via the GitLab API for the current branch, or fall back to
-  prompting if none/multiple exist)
+- `jyy glab mr open` — open the GitLab MR for the current branch in the
+  browser (find the MR via the GitLab API for the current branch, or fall
+  back to prompting if none/multiple exist)
 
 ## Jira ticket export
 
@@ -28,6 +17,27 @@ Future automations planned for this toolkit. Not yet implemented.
     basic/simplified, expand later)
   - Open question to resolve when building: output location (fixed folder
     vs. cwd vs. prompted each run)
+
+## List and Access Dev Servers
+
+- User defines a list of servers, either their raw IP or hostname (eg. in a config file or just a plain text) with optional metadata (eg. server purpose, environment, etc.)
+- `jyy dev-servers list` - shows list of servers (with perhaps brief metadata), if user chooses a server then it dumps full metadata
+- `jyy dev-servers ping` - ping a host to check connectivity
+- Nice to haves:
+  - `jyy dev-servers ssh` - shows list of servers, user chooses server then it will perform an SSH command (perhaps need another shell, tmux, or just print out ssh command for user to copy paste)
+
+## URL Bookmarks
+
+- Using user defined config, basically show list of bookmarks with brief summary (what the url is/goes to), user selects it and it launches in browser
+- Nice to have:
+  - tree-like structure, so can have "folder" bookmark, limit perhaps to 2 levels right now
+
+## YAML/JSON Config
+
+- Add a YAML/JSON config (more likely json) alongside `.env` for user defined helpful notes like:
+  - user's active directory username (our org uses for ssh/remote access)
+  - list of dev servers (see above)
+  - bookmarked urls with metadata (eg. datadog url, infoblox url, etc.) as these sometimes have weird hostname and are hard to remember, basically act as browser bookmark but in cli (see above)
 
 ## Other ideas (not yet scoped)
 
