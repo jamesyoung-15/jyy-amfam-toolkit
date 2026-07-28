@@ -32,3 +32,25 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+
+class GitlabSettings(BaseSettings):
+    """GitLab connection settings.
+
+    Kept separate from `Settings` (Jira) so Jira-only usage doesn't require
+    GitLab credentials to be configured. Loaded from the same `.env` file.
+    """
+
+    gitlab_url: str = Field(
+        default="https://gitlab.com",
+        description="GitLab base URL, e.g. https://gitlab.com",
+    )
+    gitlab_token: str = Field(
+        description="GitLab personal access token with 'api' scope"
+    )
+
+    model_config = SettingsConfigDict(
+        env_file=str(ENV_FILE),
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
