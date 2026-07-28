@@ -47,6 +47,19 @@ CONVENTIONAL_BRANCH_TYPES = [
 
 SLUG_MAX_LENGTH = 100
 
+# --- GitLab API ---
+
+GITLAB_API_VERSION_PATH = "/api/v4"
+GITLAB_REQUEST_TIMEOUT_SECONDS = 15.0
+
+# --- `glab mr create` command ---
+
+# Legacy single MR template path, checked if no named templates exist.
+MR_TEMPLATE_LEGACY_PATH = ".gitlab/merge_request_template.md"
+
+# Directory of named MR templates (GitLab supports multiple).
+MR_TEMPLATE_DIR = ".gitlab/merge_request_templates"
+
 # --- Config file location ---
 
 # Fixed, cwd-independent location so the CLI behaves the same regardless of
