@@ -2,12 +2,6 @@
 
 Future automations planned for this toolkit. Not yet implemented.
 
-## GitLab MR automation
-
-- `jyy glab mr open` — open the GitLab MR for the current branch in the
-  browser (find the MR via the GitLab API for the current branch, or fall
-  back to prompting if none/multiple exist)
-
 ## Jira ticket export
 
 - Pull a ticket's description (and comments, if present) into a local

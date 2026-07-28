@@ -128,6 +128,19 @@ target a different remote name:
 uv run jyy-amfam-toolkit repo open --remote upstream
 ```
 
+### `glab mr open` — open the GitLab MR for the current branch in the browser
+
+Must be run from inside a git repository with a GitLab remote, and
+requires `GITLAB_TOKEN` to be configured.
+
+```bash
+uv run jyy-amfam-toolkit glab mr open
+```
+
+Looks up merge requests for the current branch. If exactly one is found,
+opens it directly. If multiple exist (e.g. against different target
+branches), prompts you to choose which one to open.
+
 ### `glab mr create` — create GitLab merge request(s) from the current branch
 
 Must be run from inside a git repository with a GitLab remote, and
