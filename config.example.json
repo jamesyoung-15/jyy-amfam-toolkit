@@ -13,5 +13,23 @@
       "purpose": "database testing",
       "environment": "staging"
     }
+  ],
+  "bookmarks": [
+    {
+      "name": "Company Wiki",
+      "url": "https://wiki.example.com",
+      "description": "internal wiki"
+    },
+    {
+      "name": "Prod Dashboard",
+      "url": "https://app.datadoghq.com/dashboard/prod",
+      "description": "prod overview",
+      "folder": "Datadog"
+    },
+    {
+      "name": "Staging Dashboard",
+      "url": "https://app.datadoghq.com/dashboard/staging",
+      "folder": "Datadog"
+    }
   ]
 }

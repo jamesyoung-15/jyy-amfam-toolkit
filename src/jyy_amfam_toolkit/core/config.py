@@ -27,11 +27,26 @@ class DevServer(BaseModel):
     environment: str | None = None
 
 
+class Bookmark(BaseModel):
+    """A user-defined URL bookmark entry.
+
+    `folder` groups related bookmarks together for display (e.g. "Datadog").
+    None means the bookmark is shown at the top level. Only one level of
+    folders is supported (no nested folders).
+    """
+
+    name: str
+    url: str
+    description: str | None = None
+    folder: str | None = None
+
+
 class ToolkitConfig(BaseModel):
     """Top-level shape of config.json."""
 
     ad_username: str | None = None
     dev_servers: list[DevServer] = []
+    bookmarks: list[Bookmark] = []
 
 
 def load_config(path: Path = CONFIG_JSON_PATH) -> ToolkitConfig | None:
