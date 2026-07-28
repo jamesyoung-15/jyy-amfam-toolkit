@@ -31,6 +31,36 @@ def temp_git_repo(tmp_path: Path) -> Generator[Path]:
         (repo_dir / "README.md").write_text("test\n")
         subprocess.run(["git", "add", "README.md"], check=True)
         subprocess.run(["git", "commit", "-q", "-m", "initial commit"], check=True)
+        subprocess.run(
+            [
+                "git",
+                "remote",
+                "add",
+                "origin",
+                "git@gitlab.com:my-user/path/to/repo.git",
+            ],
+            check=True,
+        )
+        yield repo_dir
+    finally:
+        os.chdir(original_cwd)
+
+
+@pytest.fixture
+def temp_git_repo_no_remote(tmp_path: Path) -> Generator[Path]:
+    """Create a temporary git repo with one commit and no remote configured."""
+    repo_dir = tmp_path / "repo-no-remote"
+    repo_dir.mkdir()
+
+    original_cwd = Path.cwd()
+    os.chdir(repo_dir)
+    try:
+        subprocess.run(["git", "init", "-q"], check=True)
+        subprocess.run(["git", "config", "user.email", "test@example.com"], check=True)
+        subprocess.run(["git", "config", "user.name", "Test User"], check=True)
+        (repo_dir / "README.md").write_text("test\n")
+        subprocess.run(["git", "add", "README.md"], check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "initial commit"], check=True)
         yield repo_dir
     finally:
         os.chdir(original_cwd)
@@ -112,3 +142,31 @@ def test_current_branch_reflects_checkout_switch(temp_git_repo: Path) -> None:
     git_utils.checkout_branch(initial_branch)
 
     assert git_utils.current_branch() == initial_branch
+
+
+def test_get_remote_url_returns_configured_origin_url(temp_git_repo: Path) -> None:
+    assert (
+        git_utils.get_remote_url("origin") == "git@gitlab.com:my-user/path/to/repo.git"
+    )
+
+
+def test_get_remote_url_defaults_to_origin(temp_git_repo: Path) -> None:
+    assert git_utils.get_remote_url() == "git@gitlab.com:my-user/path/to/repo.git"
+
+
+def test_get_remote_url_returns_none_for_missing_remote(temp_git_repo: Path) -> None:
+    assert git_utils.get_remote_url("upstream") is None
+
+
+def test_get_remote_url_returns_none_when_no_remote_configured(
+    temp_git_repo_no_remote: Path,
+) -> None:
+    assert git_utils.get_remote_url() is None
+
+
+def test_get_remote_url_supports_non_default_remote_name(temp_git_repo: Path) -> None:
+    subprocess.run(
+        ["git", "remote", "add", "upstream", "https://github.com/user/repo.git"],
+        check=True,
+    )
+    assert git_utils.get_remote_url("upstream") == "https://github.com/user/repo.git"

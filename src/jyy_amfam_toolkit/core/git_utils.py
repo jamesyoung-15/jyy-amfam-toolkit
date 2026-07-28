@@ -73,3 +73,22 @@ def checkout_branch(name: str) -> None:
     )
     if result.returncode != 0:
         raise GitError(result.stderr.strip() or "git checkout failed")
+
+
+def get_remote_url(remote_name: str = "origin") -> str | None:
+    """Return the URL of a git remote, or None if it doesn't exist.
+
+    A missing remote is a common, expected case (e.g. a local-only repo
+    with no remote configured), so this returns None rather than raising.
+    """
+    result = subprocess.run(
+        ["git", "remote", "get-url", remote_name],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    if result.returncode != 0:
+        return None
+
+    return result.stdout.strip()
