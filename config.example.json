@@ -1,0 +1,17 @@
+{
+  "ad_username": "your.ad.username",
+  "dev_servers": [
+    {
+      "name": "dev-web-1",
+      "address": "10.0.0.5",
+      "purpose": "web frontend testing",
+      "environment": "dev"
+    },
+    {
+      "name": "staging-db",
+      "address": "staging-db.internal.example.com",
+      "purpose": "database testing",
+      "environment": "staging"
+    }
+  ]
+}

@@ -66,3 +66,8 @@ MR_TEMPLATE_DIR = ".gitlab/merge_request_templates"
 # which directory it's run from after a global `uv tool install`.
 CONFIG_DIR = Path.home() / ".config" / "jyy-amfam-toolkit"
 ENV_FILE = CONFIG_DIR / ".env"
+CONFIG_JSON_PATH = CONFIG_DIR / "config.json"
+
+# --- `dev-servers` command ---
+
+DEFAULT_PING_TIMEOUT_SECONDS = 5
