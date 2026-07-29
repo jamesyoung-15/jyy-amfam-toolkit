@@ -10,6 +10,7 @@ dependencies = [
     "python-slugify>=8.0.4",
     "questionary>=2.1.1",
     "ruff>=0.16.0",
+    "truststore>=0.10.4",
     "typer>=0.27.0",
 ]
 
