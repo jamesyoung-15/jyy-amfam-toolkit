@@ -17,13 +17,7 @@ app = typer.Typer(help="Personal dev workflow automation toolkit.")
 def main() -> None:
     """Personal dev workflow automation toolkit."""
     # Use the OS-native certificate trust store instead of certifi's bundled
-    # CAs. Needed on networks with a TLS-inspecting proxy (e.g. corporate
-    # MITM) whose CA cert isn't in certifi's bundle, which otherwise causes
-    # "certificate verify failed" errors on some hosts (observed with
-    # GitLab, not Jira -- likely due to different proxy/egress paths).
-    # Called here (once, at the application entrypoint) rather than in
-    # individual settings/clients, per truststore's own guidance that
-    # inject_into_ssl() is for applications, not libraries.
+    # CAs to bypass "certificate verify failed" errors on some hosts
     truststore.inject_into_ssl()
 
 
